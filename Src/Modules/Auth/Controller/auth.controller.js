@@ -2,7 +2,7 @@ import employeeModel from '../../../../DB/Models/Employee.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import companyModel from '../../../../DB/Models/Company.model.js';
-import holidayModel from '../../../../DB/Models/Hoilday.model.js';
+import vacationModel from '../../../../DB/Models/Vacation.model.js';
 import { getPagination } from '../../../Services/service.controller.js';
 
 export const signupCompany = async (req, res) => {
@@ -57,21 +57,3 @@ export const signinCompany = async (req, res) => {
     return res.status(200).json({ message: "success you are company", token })
 }
 
-export const testPage1 = async (req, res) => {
-    const { page, perPage } = req.query;
-    const holidays = await holidayModel.find().skip((page - 1) * perPage).limit(perPage);
-    const totalDocuments = await holidayModel.countDocuments();
-    const totalPages = Math.ceil(totalDocuments / perPage);
-    return res.json({ holidays, page, totalPages });
-}
-export const testPage = async (req, res) => {
-    const { page, perPage } = req.query;
-    const { limit, offset } = getPagination(page, perPage);
-    const holidays = await holidayModel.paginate({}, { offset, limit })
-    return res.json({
-        holidays: holidays.docs,
-        page: holidays.page,
-        totalPages: holidays.totalPages,
-        totalHolidays: holidays.totalDocs,
-    });
-}

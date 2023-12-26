@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types, model } from "mongoose";
 import mongoosePaginate from 'mongoose-paginate-v2';
-const holidaySchema = new Schema({
+const vacationSchema = new Schema({
     startDate: {
         type: String,
         required: true
@@ -48,8 +48,8 @@ const holidaySchema = new Schema({
 }, {
     timestamps: true,
 });
-holidaySchema.plugin(mongoosePaginate);
+vacationSchema.plugin(mongoosePaginate);
 
-const holidayModel = mongoose.models.Holiday || model('Holiday', holidaySchema);
+const vacationModel = mongoose.models.Vacation || model('Vacation', vacationSchema);
 
-export default holidayModel;
+export default vacationModel;

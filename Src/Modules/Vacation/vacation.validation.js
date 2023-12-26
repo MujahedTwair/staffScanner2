@@ -1,7 +1,7 @@
 import joi from 'joi';
 import { DateTime } from 'luxon';
 
-export const requestHolidaySchema = {
+export const requestVacationSchema = {
     body: joi.object({
       startDate: joi.string().required(),
       endDate: joi.string().required(),
@@ -20,7 +20,7 @@ export const requestHolidaySchema = {
     }),
   };
 
-export const approveHolidaySchema = {
+export const approveVacationSchema = {
     body: joi.object({
         status: joi.string().valid('Accepted', 'Rejected').required(),
         companyNote: joi.string().optional()
@@ -30,13 +30,13 @@ export const approveHolidaySchema = {
     }),
 };
 
-export const deleteHolidaySchema = {
+export const deleteVacationSchema = {
     params: joi.object({
         id: joi.string().required(),
     }),
 };
 
-export const pageHolidaySchema = {
+export const pageVacationSchema = {
   query: joi.object({
     page: joi.number().min(1),
     perPage: joi.number().min(3).max(20)

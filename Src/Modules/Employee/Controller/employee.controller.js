@@ -4,7 +4,7 @@ import attendanceModel from "../../../../DB/Models/Attendance.model.js";
 import companyModel from "../../../../DB/Models/Company.model.js";
 import { addCheckIn, calculateHours, convertToAMPM, defulatDuration, isWithinTimeRange } from '../../../Services/service.controller.js';
 import employeeModel from '../../../../DB/Models/Employee.model.js';
-import holidayModel from '../../../../DB/Models/Hoilday.model.js';
+import vacationModel from '../../../../DB/Models/Vacation.model.js';
 
 
 export const checkIn = async (req, res) => {
@@ -127,9 +127,9 @@ export const welcome = async (req, res) => {
     const end = convertToAMPM(endChecking);
     const currentDay = DateTime.now().setZone('Asia/Jerusalem').toFormat('cccc');
     const currentDate = DateTime.now().setZone('Asia/Jerusalem').toFormat('dd/MM/yyyy');
-    const unReadHolidaysCount = await holidayModel.countDocuments({ employeeId: id, isRead: false, status: { $in: ['Accepted', 'Rejected'] } });
+    const unReadVacationsCount = await vacationModel.countDocuments({ employeeId: id, isRead: false, status: { $in: ['Accepted', 'Rejected'] } });
 
-    return res.status(200).json({ fullName, start, end, currentDay, currentDate, unReadHolidaysCount });
+    return res.status(200).json({ fullName, start, end, currentDay, currentDate, unReadVacationsCount });
 }
 
 export const getAccountInformation = async (req, res) => {
@@ -155,63 +155,6 @@ export const updatePassword = async (req, res) => {
     employee.password = hashedNewPassword;
     await employee.save();
     return res.status(201).json({ message: "Password updated successfully" });
-}
-
-export const reports = async (req, res) => {
-    const { _id } = req.user;
-    let { startDuration, endDuration } = req.query;
-    ({ startDuration, endDuration } = defulatDuration(startDuration, endDuration));
-    
-    const employee = await employeeModel.findOne({ _id, isDeleted: false, })
-        .populate({
-            path: 'attendance',
-            match: {
-                createdAt: {
-                    $gte: startDuration,
-                    $lte: endDuration,
-                },
-            },
-        });
-    let allMilliSeconds = 0;
-    let days = [];
-    let notCorrectChecks = [];
-    const { attendance } = employee;
-    for (const element of attendance) {
-        if (element.leaveTime) {
-            const milliseconds = element.leaveTime - element.enterTime;
-            const hours = calculateHours(milliseconds);
-            const day = DateTime.fromJSDate(element.createdAt, { zone: "Asia/Jerusalem" }).toFormat('d/M/yyyy');
-            const enterTime = DateTime.fromMillis(element.enterTime, { zone: "Asia/Jerusalem" }).toFormat('h:mm a, d/M/yyyy');
-            const leaveTime = DateTime.fromMillis(element.leaveTime, { zone: "Asia/Jerusalem" }).toFormat('h:mm a, d/M/yyyy');
-            days.push({ day, enterTime, leaveTime, hours, enterTimestamp: element.enterTime });
-            allMilliSeconds += milliseconds;
-
-        } else {
-            const day = DateTime.fromJSDate(element.createdAt, { zone: "Asia/Jerusalem" }).toFormat('d/M/yyyy');
-            const enterTime = DateTime.fromMillis(element.enterTime, { zone: 'Asia/Jerusalem' }).toFormat('h:mm a, d/M/yyyy');
-            const shiftEnd = DateTime.fromJSDate(element.shiftEndDateTime, { zone: "Asia/Jerusalem" }).toFormat('h:mm a, d/M/yyyy');
-            const attendaceId = req.role == 'company' ? element.id : undefined;
-            notCorrectChecks.push({ day, enterTime, shiftEnd, attendaceId, enterTimestamp: element.enterTime });
-        }
-    }
-   
-    days = [...days].sort((a, b) => a.enterTimestamp - b.enterTimestamp);
-    days.forEach(ele => delete ele.enterTimestamp);
-    notCorrectChecks = [...notCorrectChecks].sort((a, b) => a.enterTimestamp - b.enterTimestamp);
-    notCorrectChecks.forEach(ele => delete ele.enterTimestamp);
-    const hours = calculateHours(allMilliSeconds);
-    const {userName, fullName} = req.role == 'company' ? employee : '';
-    return res.status(200).json({
-        message: "success",
-        userName,
-        fullName,
-        days,
-        totalHours: hours,
-        notCorrectChecks,
-        startDuration: startDuration.toFormat('d/M/yyyy'),
-        endDuration: endDuration.toFormat('d/M/yyyy'),
-        allMilliSeconds
-    });
 }
 
 const checkDeviceId = async (employee, deviceId, res) => {
