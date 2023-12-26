@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import bcrypt from 'bcryptjs';
 import attendanceModel from "../../../../DB/Models/Attendance.model.js";
 import companyModel from "../../../../DB/Models/Company.model.js";
-import { addCheckIn, calculateHours, convertToAMPM, defulatDuration, isWithinTimeRange } from '../../../Services/service.controller.js';
+import { addCheckIn, convertToAMPM, isWithinTimeRange } from '../../../Services/service.controller.js';
 import employeeModel from '../../../../DB/Models/Employee.model.js';
 import vacationModel from '../../../../DB/Models/Vacation.model.js';
 

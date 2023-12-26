@@ -7,6 +7,10 @@ import attendanceModel from '../../../../DB/Models/Attendance.model.js';
 import { addCheckIn, calculateHours, convertToAMPM, defulatDuration, getCheckOutDate, getPagination, isWithinTimeRange } from '../../../Services/service.controller.js';
 import cloudinary from '../../../Services/cloudinary.js';
 import companyModel from '../../../../DB/Models/Company.model.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const createEmployee = async (req, res) => {
     let employeeData = req.body;
@@ -179,9 +183,9 @@ export const solveCheckOut = async (req, res) => {
     const enterTimeHours = DateTime.fromMillis(attendance.enterTime, { zone: 'Asia/Jerusalem' }).toFormat('HH:mm');
     const shiftEndTime = DateTime.fromJSDate(attendance.shiftEndDateTime, { zone: 'Asia/Jerusalem' }).toFormat('HH:mm');
     if (!isWithinTimeRange(enterTimeHours, shiftEndTime, checkOutTime)) {
-        return res.status(400).json({ 
-            message: `Check out time must be between enterTime (${convertToAMPM(enterTimeHours)}), `+
-            `and shiftEndTime (${convertToAMPM(shiftEndTime)}), Rejected`
+        return res.status(400).json({
+            message: `Check out time must be between enterTime (${convertToAMPM(enterTimeHours)}), ` +
+                `and shiftEndTime (${convertToAMPM(shiftEndTime)}), Rejected`
         });
     }
     const checkOutDate = getCheckOutDate(shiftEndTime, attendance.shiftEndDateTime, checkOutTime);
@@ -255,25 +259,19 @@ export const getSpeceficEmployee = async (req, res) => {
 export const generateQr = async (req, res) => {
     const company = await companyModel.findById(req.user.id);
     const QrId = uuidv4();
-    QRCode.toDataURL(QrId, async (err, code) => {
-        try {
-            const { secure_url, public_id } = await cloudinary.uploader.upload(code, { folder: `${process.env.APP_Name}` })
-            if (company.QrImage) {
-                await cloudinary.uploader.destroy(company.QrImage.public_id);
-            }
-            company.QrImage = { secure_url, public_id };
-            company.QrId = QrId;
-            await company.save();
-            return res.json({ message: "success", secure_url, QrId });
-        } catch (error) {
-            return res.status(500).json({ message: "catch error", error });
-        }
-    });
+    const filePath = join(__dirname, '../../../Uploads/QR.jpg');
+    QRCode.toFile(filePath, QrId, (err) => {
+        return res.json({ err });
+    })
+    company.QrImage = filePath;
+    company.QrId = QrId;
+
+    return res.json({ message: "success" });
 }
 
 export const getQrImage = async (req, res) => {
     const company = await companyModel.findById(req.user.id);
-    const imageUrl = company.QrImage.secure_url;
+    const imageUrl = company.QrImage;
     if (!imageUrl) {
         return res.status(404).json({ message: "There is no QR-code yet, Please generate one" });
     }
