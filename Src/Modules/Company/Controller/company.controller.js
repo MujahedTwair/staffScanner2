@@ -257,18 +257,35 @@ export const getSpeceficEmployee = async (req, res) => {
 }
 
 export const generateQr = async (req, res) => {
-    const company = await companyModel.findById(req.user.id);
-    const QrId = uuidv4();
-    const filePath = join(__dirname, '../../../Uploads/QR.jpg');
-    QRCode.toFile(filePath, QrId, async (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error generating QR code' });
+    try {
+        const company = await companyModel.findById(req.user.id);
+        if (!company) {
+            return res.status(404).json({ message: 'Company not found' });
         }
-        company.QrImage = filePath;
-        company.QrId = QrId;
-        await company.save();
-        return res.json({ message: "QR code generated successfully" });
-    });
+
+        const QrId = uuidv4();
+        const filePath = join(__dirname, '../../../Uploads/QR.jpg');
+
+        QRCode.toFile(filePath, QrId, async (qrError) => {
+            if (qrError) {
+                console.error(qrError);
+                return res.status(500).json({ error: 'Error generating QR code' });
+            }
+
+            try {
+                company.QrImage = filePath;
+                company.QrId = QrId;
+                await company.save();
+                return res.json({ message: "QR code generated successfully" });
+            } catch (dbError) {
+                console.error(dbError);
+                // Do not try to send another response here, just log the error
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
 
 }
 
