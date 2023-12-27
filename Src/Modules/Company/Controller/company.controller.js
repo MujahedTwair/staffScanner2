@@ -268,8 +268,8 @@ export const generateQr = async (req, res) => {
 
         QRCode.toFile(filePath, QrId, async (qrError) => {
             if (qrError) {
-                console.error(qrError);
-                return res.status(500).json({ error: 'Error generating QR code' });
+                console.error("QR Code Generation Error:", qrError);
+                return res.status(500).json({ error: 'Error generating QR code', details: qrError.message });
             }
 
             try {
