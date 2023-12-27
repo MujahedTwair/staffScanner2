@@ -167,7 +167,6 @@ export const checkOutEmployee = async (req, res) => {
 
 }
 
-
 export const getEmployees = async (req, res) => {
     const { page, perPage } = req.query;
     const { limit, offset } = getPagination(page, perPage);
@@ -232,7 +231,7 @@ export const generateQr = async (req, res) => {
     const QrId = uuidv4();
     QRCode.toDataURL(QrId, async (err, code) => {
         try {
-            const { secure_url, public_id } = await cloudinary.uploader.upload(code, { folder: `${process.env.APP_Name}` })
+            const { secure_url, public_id } = await cloudinary.uploader.upload(code, { folder: `${process.env.APP_NAME}` })
             if (company.QrImage) {
                 await cloudinary.uploader.destroy(company.QrImage.public_id);
             }

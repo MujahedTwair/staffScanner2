@@ -35,7 +35,6 @@ export const reviewVacations = async (req, res) => {
 
     for (const vacation of vacations.docs) {
         if (!vacation.isRead && vacation.status != 'Waiting for approval') {
-            console.log(vacation);
             vacation.isRead = true;
             await vacation.save();
         }
