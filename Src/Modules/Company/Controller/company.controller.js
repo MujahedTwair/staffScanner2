@@ -260,13 +260,16 @@ export const generateQr = async (req, res) => {
     const company = await companyModel.findById(req.user.id);
     const QrId = uuidv4();
     const filePath = join(__dirname, '../../../Uploads/QR.jpg');
-    QRCode.toFile(filePath, QrId, (err) => {
-        return res.json({ err });
-    })
-    company.QrImage = filePath;
-    company.QrId = QrId;
+    QRCode.toFile(filePath, QrId, async (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error generating QR code' });
+        }
+        company.QrImage = filePath;
+        company.QrId = QrId;
+        await company.save();
+        return res.json({ message: "QR code generated successfully" });
+    });
 
-    return res.json({ message: "success" });
 }
 
 export const getQrImage = async (req, res) => {
