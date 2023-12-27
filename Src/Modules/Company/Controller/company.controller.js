@@ -264,7 +264,7 @@ export const generateQr = async (req, res) => {
         }
 
         const QrId = uuidv4();
-        const filePath = join(__dirname, '../../../Uploads/QR.jpg');
+        const filePath = join(__dirname, '../../../../Uploads/QR.jpg');
 
         QRCode.toFile(filePath, QrId, async (qrError) => {
             if (qrError) {
