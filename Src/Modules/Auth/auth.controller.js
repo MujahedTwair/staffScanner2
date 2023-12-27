@@ -1,9 +1,7 @@
-import employeeModel from '../../../../DB/Models/Employee.model.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import companyModel from '../../../../DB/Models/Company.model.js';
-import vacationModel from '../../../../DB/Models/Vacation.model.js';
-import { getPagination } from '../../../Services/service.controller.js';
+import employeeModel from "../../../DB/Models/Employee.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import companyModel from "../../../DB/Models/Company.model.js";
 
 export const signupCompany = async (req, res) => {
 

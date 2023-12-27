@@ -1,6 +1,6 @@
-import vacationModel from "../../../../DB/Models/Vacation.model.js";
+import vacationModel from "../../../DB/Models/Vacation.model.js";
 import jwt from "jsonwebtoken";
-import { getPagination } from "../../../Services/service.controller.js";
+import { getPagination } from "../../Services/service.controller.js";
 
 
 export const requestVacation = async (req, res) => {

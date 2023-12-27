@@ -46,3 +46,10 @@ export const reportCompSchema = {
         employeeId: joi.string().length(24).required()
     })
 }
+
+export const solveCheckOutSchema = {
+    body: joi.object({
+        attendanceId: joi.string().length(24).required(),
+        checkOutTime: joi.string().required()
+    }),
+};

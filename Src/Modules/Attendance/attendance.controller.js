@@ -1,7 +1,8 @@
 import { DateTime } from "luxon";
-import employeeModel from "../../../../DB/Models/Employee.model.js";
-import { calculateHours, defulatDuration } from "../../../Services/service.controller.js";
-import { printExcel } from "../../../Services/excel.js";
+import employeeModel from "../../../DB/Models/Employee.model.js";
+import { calculateHours, defulatDuration, getCheckOutDate } from "../../Services/service.controller.js";
+import { printExcel } from "../../Services/excel.js";
+import attendanceModel from "../../../DB/Models/Attendance.model.js";
 
 export const reportEmp = async (req, res) => {
     const { _id } = req.user;
@@ -141,4 +142,30 @@ export const reportComp = async (req, res, next) => {
     req.user._id = employeeId;
     req.role = 'company';
     next();
+}
+
+export const solveCheckOut = async (req, res) => {
+    const { attendanceId, checkOutTime } = req.body;
+    const attendance = await attendanceModel.findById(attendanceId);
+    if (!attendance) {
+        return res.status(400).json({ message: "Attendance not found" });
+    }
+    if (attendance.isCheckOut) {
+        return res.status(409).json({ message: "This attendace is already checked out, rejected" });
+    }
+    const enterTimeHours = DateTime.fromMillis(attendance.enterTime, { zone: 'Asia/Jerusalem' }).toFormat('HH:mm');
+    const shiftEndTime = DateTime.fromJSDate(attendance.shiftEndDateTime, { zone: 'Asia/Jerusalem' }).toFormat('HH:mm');
+    if (!isWithinTimeRange(enterTimeHours, shiftEndTime, checkOutTime)) {
+        return res.status(400).json({ 
+            message: `Check out time must be between enterTime (${convertToAMPM(enterTimeHours)}), `+
+            `and shiftEndTime (${convertToAMPM(shiftEndTime)}), Rejected`
+        });
+    }
+    const checkOutDate = getCheckOutDate(shiftEndTime, attendance.shiftEndDateTime, checkOutTime);
+    attendance.leaveTime = checkOutDate.toMillis();
+    attendance.isCheckOut = true;
+    attendance.shiftEndDateTime = undefined;
+    await attendance.save();
+
+    return res.status(201).json({ message: `The check-out done successfully at ${convertToAMPM(checkOutTime)}`, attendance });
 }

@@ -1,10 +1,10 @@
-import { DateTime } from 'luxon';
-import bcrypt from 'bcryptjs';
-import attendanceModel from "../../../../DB/Models/Attendance.model.js";
-import companyModel from "../../../../DB/Models/Company.model.js";
-import { addCheckIn, convertToAMPM, isWithinTimeRange } from '../../../Services/service.controller.js';
-import employeeModel from '../../../../DB/Models/Employee.model.js';
-import vacationModel from '../../../../DB/Models/Vacation.model.js';
+import { DateTime } from "luxon";
+import bcrypt from "bcryptjs";
+import attendanceModel from "../../../DB/Models/Attendance.model.js";
+import companyModel from "../../../DB/Models/Company.model.js";
+import { addCheckIn, convertToAMPM, isWithinTimeRange } from "../../Services/service.controller.js";
+import employeeModel from "../../../DB/Models/Employee.model.js";
+import vacationModel from "../../../DB/Models/Vacation.model.js";
 
 
 export const checkIn = async (req, res) => {
@@ -82,14 +82,6 @@ export const checkOut = async (req, res) => {
         return res.status(201).json({ message: "success check out", newCheckOut });
     }
     return res.status(201).json({ message: "There is something wronge in database... , rejected" });
-}
-
-export const newCheckin = async (req, res) => {
-    const check = await attendanceModel.create({
-        isCheckIn: true, isCheckOut: true, enterTime: '4', leaveTime: '4', date: '4',
-        employeeId: req.user._id
-    })
-    return res.json({ message: "new checkIn", check });
 }
 
 export const getAllowedCheck = async (req, res) => {

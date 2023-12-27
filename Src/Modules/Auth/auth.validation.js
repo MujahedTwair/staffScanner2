@@ -1,4 +1,4 @@
-import joi from 'joi'
+import joi from "joi";
 
 
 export const signinCompanySchema = {
@@ -15,7 +15,6 @@ export const signinCompanySchema = {
 
 };
 
-
 export const signinEmployeeSchema = {
     body: joi.object({
         userName: joi.string().alphanum().required().messages({
@@ -29,8 +28,6 @@ export const signinEmployeeSchema = {
         deviceId: joi.string().required().max(16)
     })
 }
-
-
 
 export const testSchema = {
     query: joi.object({

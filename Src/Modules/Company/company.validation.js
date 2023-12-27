@@ -1,5 +1,4 @@
 import joi from 'joi';
-import { DateTime } from 'luxon';
 
 export const createEmployeeSchema = {
     body: joi.object({
@@ -15,27 +14,20 @@ export const createEmployeeSchema = {
         endChecking: joi.string().required().regex(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)
 
     }),
-};
+}
 
 export const editIPAddressSchema = {
     body: joi.object({
         IPAddress: joi.string().required(),
     }),
 
-};
+}
 
 export const checkEmployeeSchema = {
     body: joi.object({
         employeeId: joi.string().required(),
     }),
-};
-
-export const solveCheckOutSchema = {
-    body: joi.object({
-        attendanceId: joi.string().length(24).required(),
-        checkOutTime: joi.string().required()
-    }),
-};
+}
 
 export const updateEmployeeSchema = {
     params: joi.object({
