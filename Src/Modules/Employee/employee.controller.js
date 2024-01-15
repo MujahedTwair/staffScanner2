@@ -18,7 +18,7 @@ export const checkIn = async (req, res) => {
     }
 
     const { _id, startChecking, endChecking } = employee;
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jerusalem' });
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: process.env.TIME_ZONE });
 
     if (!isWithinTimeRange(startChecking, endChecking, currentTime)) {
         return res.status(409).json({ message: "you are out of range checking, rejected", startChecking, endChecking, currentTime });
@@ -34,8 +34,8 @@ export const checkIn = async (req, res) => {
             return await addCheckIn(employee, currentTime, res);
         }
     } else if (lastCheckIn.isCheckOut) {
-        const lastDayChecked = DateTime.fromJSDate(lastCheckIn.createdAt, { zone: 'Asia/Jerusalem' }).toISODate();
-        const thisDay = DateTime.now().setZone('Asia/Jerusalem').toISODate();
+        const lastDayChecked = DateTime.fromJSDate(lastCheckIn.createdAt, { zone: process.env.TIME_ZONE }).toISODate();
+        const thisDay = DateTime.now().setZone(process.env.TIME_ZONE).toISODate();
         if (lastDayChecked == thisDay) {
             return res.status(404).json({ message: "Not allowed more than one check-in per day" });
         } else {
@@ -56,7 +56,7 @@ export const checkOut = async (req, res) => {
     }
 
     const { _id, startChecking, endChecking } = employee;
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jerusalem' });
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: process.env.TIME_ZONE });
     if (!(isWithinTimeRange(startChecking, endChecking, currentTime))) {
         return res.status(409).json({ message: "you are out of range checking, rejected", startChecking, endChecking, currentTime });
     }
@@ -87,7 +87,7 @@ export const checkOut = async (req, res) => {
 export const getAllowedCheck = async (req, res) => {
     const employee = req.user;
     const { _id, startChecking, endChecking } = employee;
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jerusalem' });
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: process.env.TIME_ZONE });
     if (!isWithinTimeRange(startChecking, endChecking, currentTime)) {
         return res.status(409).json({ message: "you are out of range checking, rejected", startChecking, endChecking, currentTime });
     }
@@ -101,8 +101,8 @@ export const getAllowedCheck = async (req, res) => {
             return res.status(201).json({ message: "checkIn" });
         }
     } else if (lastCheckIn.isCheckOut) {
-        const lastDayChecked = DateTime.fromJSDate(lastCheckIn.createdAt, { zone: 'Asia/Jerusalem' }).toISODate();
-        const thisDay = DateTime.now().setZone('Asia/Jerusalem').toISODate();
+        const lastDayChecked = DateTime.fromJSDate(lastCheckIn.createdAt, { zone: process.env.TIME_ZONE }).toISODate();
+        const thisDay = DateTime.now().setZone(process.env.TIME_ZONE).toISODate();
         if (lastDayChecked == thisDay) {
             return res.status(404).json({ message: "Not allowed more than one check per day" });
         } else {
@@ -117,8 +117,8 @@ export const welcome = async (req, res) => {
     const { fullName, startChecking, endChecking, id } = employee;
     const start = convertToAMPM(startChecking);
     const end = convertToAMPM(endChecking);
-    const currentDay = DateTime.now().setZone('Asia/Jerusalem').toFormat('cccc');
-    const currentDate = DateTime.now().setZone('Asia/Jerusalem').toFormat('dd/MM/yyyy');
+    const currentDay = DateTime.now().setZone(process.env.TIME_ZONE).toFormat('cccc');
+    const currentDate = DateTime.now().setZone(process.env.TIME_ZONE).toFormat('dd/MM/yyyy');
     const unReadVacationsCount = await vacationModel.countDocuments({ employeeId: id, isRead: false, status: { $in: ['Accepted', 'Rejected'] } });
 
     return res.status(200).json({ fullName, start, end, currentDay, currentDate, unReadVacationsCount });

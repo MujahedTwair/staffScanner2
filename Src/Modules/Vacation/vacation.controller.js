@@ -139,6 +139,6 @@ export const deleteVacation = async (req, res) => {
 }
 
 export const getVacationTypes = async (req, res) => {
-    const types = ['Sick', 'Vacation', 'Travelling'];
+    const types = ['Sick', 'Annual', 'Travelling'];
     return res.status(201).json({ message: "success", types });
 }

@@ -22,8 +22,8 @@ const vacationSchema = new Schema({
     },
     type: {
         type: String,
-        default: 'Vacation',
-        enum: ['Sick', 'Vacation', 'Travelling'],
+        default: 'Annual',
+        enum: ['Sick', 'Annual', 'Travelling'],
         required: true
     },
     paid: {

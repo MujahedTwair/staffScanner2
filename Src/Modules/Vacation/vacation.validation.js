@@ -5,13 +5,13 @@ export const requestVacationSchema = {
   body: joi.object({
     startDate: joi.string().required(),
     endDate: joi.string().required(),
-    type: joi.string().valid('Sick', 'Vacation', 'Travelling').required(),
+    type: joi.string().valid('Sick', 'Annual', 'Travelling').required(),
     paid: joi.boolean().required(),
     reason: joi.string(),
   }).custom((value, helpers) => {
     const startDate = DateTime.fromFormat(value.startDate, 'd/M/yyyy');
     const endDate = DateTime.fromFormat(value.endDate, 'd/M/yyyy');
-    const now = DateTime.now().setZone('Asia/Jerusalem').startOf('day');
+    const now = DateTime.now().setZone(process.env.TIME_ZONE).startOf('day');
     if (startDate.isValid && endDate.isValid && startDate >= now && endDate >= startDate) {
       return value;
     } else {
